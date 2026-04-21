@@ -1,0 +1,42 @@
+export const bacalla = [
+  {
+    id: 1,
+    nom: "Bacallà de l'Atlàntic",
+    descripcio: "El més comú al mercat. Carn blanca i ferma, ideal per a l'esqueixada i el pil-pil.",
+    origen: "Atlàntic Nord",
+    temporada: "Tot l'any",
+    textura: "Ferma",
+  },
+  {
+    id: 2,
+    nom: "Bacallà del Pacífic",
+    descripcio: "Variant del Pacífic Nord. Lleugerament més suau i amb menys greix que l'Atlàntic.",
+    origen: "Pacífic Nord",
+    temporada: "Tot l'any",
+    textura: "Suau",
+  },
+  {
+    id: 3,
+    nom: "Bacallà de Noruega (Skrei)",
+    descripcio: "Bacallà migrador noruec, considerat el de més qualitat. Temporada d'hivern.",
+    origen: "Noruega",
+    temporada: "Gener - Abril",
+    textura: "Molt ferma",
+  },
+  {
+    id: 4,
+    nom: "Bacallà d'Islàndia",
+    descripcio: "Conegut per la seva qualitat excel·lent gràcies a les aigües fredes i netes d'Islàndia.",
+    origen: "Islàndia",
+    temporada: "Tot l'any",
+    textura: "Ferma",
+  },
+  {
+    id: 5,
+    nom: "Bacallà de les Illes Fèroe",
+    descripcio: "Capturat en aigües profundes. Carn molt blanca i textura densa. Molt apreciat a Europa.",
+    origen: "Illes Fèroe",
+    temporada: "Primavera - Tardor",
+    textura: "Densa",
+  },
+];
