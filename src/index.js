@@ -2,7 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import bacallaRouter from './routes/bacalla.js';
-import { bacalla } from './data/bacalla.js';
+import { connectDB } from './db/connect.js';
+import Bacalla from './models/Bacalla.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -29,20 +30,25 @@ app.use(express.json());
 app.use('/api/bacalla', bacallaRouter);
 
 // Health check amb informació útil de l'API
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+  const total = await Bacalla.countDocuments().catch(() => 0);
   res.json({
     status: 'ok',
     message: 'API Bacallà funcionant',
     version: '1.0.0',
+    db: 'MongoDB Atlas',
     endpoints: [
       { method: 'GET',  path: '/api/bacalla',     descripcio: 'Totes les varietats' },
       { method: 'GET',  path: '/api/bacalla/:id', descripcio: 'Detall d\'una varietat per id' },
       { method: 'POST', path: '/api/bacalla',     descripcio: 'Crear una nova varietat' },
     ],
-    total_varietats: bacalla.length,
+    total_varietats: total,
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor escoltant a http://localhost:${PORT}`);
+// Connecta a Mongo i arrenca el servidor
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Servidor escoltant a http://localhost:${PORT}`);
+  });
 });

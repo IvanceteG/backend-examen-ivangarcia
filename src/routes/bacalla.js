@@ -1,52 +1,63 @@
 import { Router } from "express";
-// Importa l'array de dades (fa de "base de dades" en memòria)
-import { bacalla } from "../data/bacalla.js";
+import Bacalla from "../models/Bacalla.js";
 
 const router = Router();
 
-// GET /api/bacalla — retorna totes les varietats de l'array
-router.get("/", (req, res) => {
-  res.json(bacalla);
+// GET /api/bacalla — totes les varietats, ordenades per id ascendent
+router.get("/", async (req, res) => {
+  try {
+    const varietats = await Bacalla.find().sort({ id: 1 });
+    res.json(varietats);
+  } catch (err) {
+    res.status(500).json({ error: "Error obtenint les varietats" });
+  }
 });
 
-// GET /api/bacalla/:id — retorna una varietat concreta per id
-router.get("/:id", (req, res) => {
-  // Converteix l'id de string a número (els params sempre arriben com a string)
+// GET /api/bacalla/:id — detall per id numèric
+router.get("/:id", async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const varietat = bacalla.find((b) => b.id === id);
-
-  // Si no existeix, retorna 404 amb missatge d'error
-  if (!varietat) {
-    return res.status(404).json({ error: `No s'ha trobat cap varietat amb id ${id}` });
+  if (Number.isNaN(id)) {
+    return res.status(400).json({ error: "L'id ha de ser un número" });
   }
 
-  res.json(varietat);
+  try {
+    const varietat = await Bacalla.findOne({ id });
+    if (!varietat) {
+      return res.status(404).json({ error: `No s'ha trobat cap varietat amb id ${id}` });
+    }
+    res.json(varietat);
+  } catch (err) {
+    res.status(500).json({ error: "Error obtenint la varietat" });
+  }
 });
 
-// POST /api/bacalla — crea una nova varietat
-router.post("/", (req, res) => {
-  // Extreu els camps del cos de la petició (ve en JSON gràcies a express.json())
+// POST /api/bacalla — crear una nova varietat
+router.post("/", async (req, res) => {
   const { nom, origen, tipus, descripcio } = req.body;
 
-  // Validació: si falta algun camp, retorna 400
   if (!nom || !origen || !tipus || !descripcio) {
-    return res.status(400).json({ error: "Els camps nom, origen, tipus i descripcio són obligatoris" });
+    return res.status(400).json({
+      error: "Els camps nom, origen, tipus i descripcio són obligatoris",
+    });
   }
 
-  // Construeix el nou objecte; l'id el genera el servidor (longitud de l'array + 1)
-  const novaVarietat = {
-    id: bacalla.length + 1,
-    nom,
-    origen,
-    tipus,
-    descripcio,
-  };
+  try {
+    // Genera el següent id agafant el màxim actual + 1
+    const ultim = await Bacalla.findOne().sort({ id: -1 }).select("id");
+    const nouId = (ultim?.id || 0) + 1;
 
-  // Afegeix la nova varietat a l'array (persistència en memòria, es perd en reiniciar)
-  bacalla.push(novaVarietat);
+    const novaVarietat = await Bacalla.create({
+      id: nouId,
+      nom,
+      origen,
+      tipus,
+      descripcio,
+    });
 
-  // Retorna 201 (Created) amb el recurs creat
-  res.status(201).json(novaVarietat);
+    res.status(201).json(novaVarietat);
+  } catch (err) {
+    res.status(500).json({ error: "Error creant la varietat" });
+  }
 });
 
 export default router;
